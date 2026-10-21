@@ -4,17 +4,17 @@
 
 **a. Initial design**
 
-The final model has four main classes. `Owner` represents the person using the planner and owns a list of `Pet` objects. `Pet` stores a pet's name and species. `Task` stores its pet, time, duration, priority, due date, completion state, and recurrence frequency. `Scheduler` owns the tasks and handles sorting, filtering, conflict checks, and completion.
+The final model has four main classes. `Owner` represents the person using the planner and owns a list of `Pet` objects. `Pet` stores a pet's name, species, and its `Task` objects. `Task` stores its time, duration, priority, due date, completion state, and recurrence frequency. `Scheduler` coordinates tasks across the owner's pets and handles sorting, filtering, conflict checks, recurrence, free-slot search, and JSON persistence.
 
 **b. Design changes**
 
-The scheduling methods live on `Scheduler` rather than being spread across the UI or individual pets. That keeps `app.py` focused on collecting input and displaying results, while the same behavior can be exercised from the CLI demo and pytest.
+The scheduling methods live on `Scheduler`, while task lists belong to each `Pet`. This keeps `app.py` focused on collecting input and displaying results, while the same behavior can be exercised from the CLI demo and pytest.
 
 ## 2. Scheduling Logic and Tradeoffs
 
 **a. Constraints and priorities**
 
-The scheduler orders tasks by their 24-hour `HH:MM` value and can filter by pet and completion state. Tasks also retain duration and priority for display. Daily and weekly frequency controls what gets created after completion.
+The scheduler orders tasks by 24-hour `HH:MM` or by priority with time as a tie-breaker, filters by pet and completion state, detects exact-time conflicts, and searches for an opening that fits task durations. Daily and weekly frequency controls what gets created after completion.
 
 **b. Tradeoffs**
 
@@ -36,7 +36,7 @@ I kept conflict detection limited to exact start-time matches rather than adding
 
 **a. What I tested**
 
-The seven tests cover chronological order, case-insensitive pet filtering, completion filtering, daily recurrence, weekly recurrence, duplicate-time warnings across pets, different-date non-conflicts, and empty schedules. These checks cover the main behaviors and a few boundary cases without depending on Streamlit rendering.
+The twelve tests cover chronological and priority ordering, case-insensitive pet filtering, completion filtering, daily/weekly recurrence, duplicate-time warnings across pets, different-date non-conflicts, empty schedules, multi-pet task ownership, duration-aware slot search, and JSON persistence. These checks cover the main behaviors without depending on Streamlit rendering.
 
 **b. Confidence**
 
